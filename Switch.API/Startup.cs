@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Castle.Core.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Switch.Infra.Data.Context;
+using System;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Switch.API
 {
@@ -17,7 +16,7 @@ namespace Switch.API
         IConfiguration Configuration { get; set; }
         public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder().AddJsonFile("config.json");
+            var builder = new ConfigurationBuilder().AddJsonFile("config.json", optional: true, reloadOnChange: true);
             Configuration = builder.Build();
         }
 
@@ -31,7 +30,8 @@ namespace Switch.API
         public void ConfigureServices(IServiceCollection services)
         {
             var conn = Configuration.GetConnectionString("SwitchDB");
-            services.AddDbContext<SwitchContext>(option => option.UseLazyLoadingProxies().UseMySql(conn, m => m.MigrationsAssembly("Switch.Infra.Data")));
+            services.AddDbContext<SwitchContext>(option => option.UseLazyLoadingProxies()
+                                                    .UseMySql(conn, m => m.MigrationsAssembly("Switch.Infra.Data")));
 
             services.AddMvcCore();
         }

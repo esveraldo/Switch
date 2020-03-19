@@ -1,7 +1,5 @@
 ﻿using Switch.Domain.Enums;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Switch.Domain.Entities
 {
