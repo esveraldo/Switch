@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
+using Switch.BB.Reports;
 using Switch.Domain.Entities;
 using Switch.Domain.Enums;
 using Switch.Infra.CrossCutting;
@@ -81,6 +82,7 @@ namespace Switch.BB
                     dbcontext.Update<Usuario>(Esveraldo);
                     dbcontext.SaveChanges();*/
 
+                    //CHANGE TRACKER(QUANDO VOCE CRIA dbcontext.ChangeTracker, tem que criar funcao, como la no final ExibirChangeTracke )
                     /*var usuario0 = CriarUsuario("usuario0");
                     Console.WriteLine("Criando usuario0..");
                     Console.WriteLine("Verificando o ChangeTracker de usuario0");
@@ -152,11 +154,91 @@ namespace Switch.BB
 
                     //----------------------------------------//
 
-                    var Esveraldo = dbcontext.Usuarios.FirstOrDefault(u => u.Nome == "Esveraldo");
-                    Esveraldo.Senha = "123456";
+                    //EAGER LOADING - faz o carregamento de todas as informações(imediato) - ver no log
 
-                    dbcontext.Update<Usuario>(Esveraldo);
-                    dbcontext.SaveChanges();
+                    //var instituicao = dbcontext.InstituicoesEnsino.include(i => i.Usuario).FirstOrDefault();
+                    //var usuario = instituicao.Usuario;
+
+                    //--------------------------------------//
+
+                    //LAZY LOADING - carregamento sob demanda ver no log
+
+                    //var usuario = dbcontext.Usuarios.FirstOrDefault();
+                    //var instituicoes = usuario.InstituicaoDeEnsino;
+
+                    //--------------------------------//
+
+                    //var Esveraldo = dbcontext.Usuarios.FirstOrDefault(u => u.Nome == "Esveraldo");
+                    //Esveraldo.Senha = "123456";
+
+                    //dbcontext.Update<Usuario>(Esveraldo);
+                    //dbcontext.SaveChanges();
+
+                    //--------------------------------//
+
+                    //ADICIONAR INSTANCIA RELACIONADA
+
+                    /*var jose = CriarUsuario("José");
+
+                    jose.InstituicoesDeEnsino.Add(new InstituicaoDeEnsino() { Nome = "Faculdade Unicarioca" });
+                    jose.Identificacao = new Identificacao() { Numero = "123456789" });
+
+                    dbcontext.Usuarios.Add(jose);
+                    dbcontext.SaveChanges();*/
+
+                    //ATUALIZAR INSTANCIA RELACIONADA
+
+                    /*var jose = dbcontext.Usuarios.FirstOrDefault(u => u.Nome == "José");
+                    var instituicaoDeEnsino = jose.InstituicoesDeEnsino.FirstOrDefault(i => i.Nome.Contains("Faculdade Unicarioca"));
+
+                    instituicaoDeEnsino.Nome = "Faculdade Unicarioca - Tecnologia";
+                    dbcontext.SaveChanges();*/
+
+                    //REMOVER ITEM DE UMA INSTANCIA
+
+                    /*var jose = dbcontext.Usuarios.FirstOrDefault(u => u.Nome == "José");
+                    var instituicaoDeEnsino = jose.InstituicoesDeEnsino.FirstOrDefault(i => i.Nome == "Faculdade Unicarioca - Tecnologia");
+
+                    jose.InstituicoesDeEnsino.Remove(instituicaoDeEnsino);
+
+                    dbcontext.SaveChanges();*/
+
+                    //------------------------------//
+
+                    //PROJEÇÃO COM EF CORE
+
+                    /*var sql = "select Nome, SobreNome from usuarios";
+
+                    var connection = dbcontext.Database.GetDbConnection();
+                    var ListaUsuarios = new List<UsuarioDTO>();
+
+                    using (var command = connection.CreateCommand())
+                    {
+                        connection.Open();
+                        command.CommandText = sql;
+
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            if (dataReader.HasRows)
+                            {
+                                while (dataReader.Read())
+                                {
+                                    var usuarioDTO = new UsuarioDTO();
+                                    usuarioDTO.Nome = dataReader["nome"].ToString();
+                                    usuarioDTO.SobreNome = dataReader["sobrenome"].ToString();
+                                    ListaUsuarios.Add(usuarioDTO);
+                                }
+
+                            }
+                        }
+                    }*/
+
+                    //LIMPAR O PARAMETRO CONTRA SQL INJECTION
+
+                    var FiltroPesquisa = "Esveraldo";
+
+                    var sql = "select Nome, SobreNome from usuarios where nome = '@nomeUsuario'";
+
                 }
             }
             catch (Exception e)
